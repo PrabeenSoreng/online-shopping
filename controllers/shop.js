@@ -12,6 +12,13 @@ exports.getProducts = (req, res) => {
     });
 };
 
+exports.getProduct = (req, res) => {
+    const prodId = req.params.productId;
+    Product.findById(prodId, product => {
+        res.render('shop/product-detail', { pageTitle: product.title, path: '', product: product });
+    });
+};
+
 exports.getCart = (req, res) => {
     res.render('shop/cart', { pageTitle: 'Your Cart', path: '/cart' });
 };
