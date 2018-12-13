@@ -49,3 +49,9 @@ exports.getProducts = (req, res) => {
         res.render('admin/products', { prods: products, pageTitle: 'Admin Products', path: '/admin/products' })
     })
 };
+
+exports.postDeleteProduct = (req, res) => {
+    const prodId = req.body.productId;
+    Product.deleteById(prodId);
+    res.redirect('/admin/products');
+};
