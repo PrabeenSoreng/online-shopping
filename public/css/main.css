@@ -153,6 +153,28 @@ img {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
 }
 
+.cart__item-list {
+    width: 50%;
+    margin: auto;
+    padding: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+}
+
+.cart__item {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.cart__item h1 {
+    flex-grow: 8;
+}
+
+.cart__item h2,
+.cart__item form {
+    flex-grow: 1;
+}
+
 .card__header,
 .card__content {
     padding: 1rem;
@@ -197,11 +219,23 @@ img {
     background: white;
     border-radius: 3px;
     cursor: pointer;
+    margin: auto;
+}
+
+.danger {
+    border: 1px solid red;
+    color: red;
 }
 
 .btn:hover,
 .btn:active {
     background-color: #00695c;
+    color: white;
+}
+
+.danger:hover,
+.danger:active {
+    background-color: red;
     color: white;
 }
 
