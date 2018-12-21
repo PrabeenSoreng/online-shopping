@@ -20,7 +20,6 @@ const userSchema = new Schema({
 });
 
 userSchema.methods.addToCart = function(product) {
-    console.log(this.cart.items);
     const cartProductIndex = this.cart.items.findIndex(cp => {
         return cp.productId.toString() === product._id.toString();
     });
@@ -46,6 +45,11 @@ userSchema.methods.removeFromCart = function(productId) {
         return item.productId.toString() !== productId.toString();
     });
     this.cart.items = updatedCartItems;
+    return this.save();
+};
+
+userSchema.methods.clearCart = function() {
+    this.cart = { items: [] };
     return this.save();
 };
 
