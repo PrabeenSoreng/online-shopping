@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
 const error = require('./controllers/not-found');
 // const mongoConnect = require('./util/database').mongoConnect;
 const mongoose = require('mongoose');
@@ -27,6 +28,7 @@ app.use((req, res, next) => {
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 
 app.use(error.get404);
 
