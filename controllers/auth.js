@@ -3,7 +3,11 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
 exports.getLogin = (req, res) => {
-    res.render('auth/login', { path: '/login', pageTitle: 'Login', isAuthenticated: false });
+    let message = req.flash('error');
+    if (message.length > 0) message = message[0];
+    else message = null;
+
+    res.render('auth/login', { path: '/login', pageTitle: 'Login', errorMessage: message });
 };
 
 exports.postLogin = (req, res) => {
@@ -11,6 +15,7 @@ exports.postLogin = (req, res) => {
     const password = req.body.password;
     User.findOne({ email: email })
         .then(user => {
+            req.flash('error', 'Invalid email or password.');
             if (!user) res.redirect('/login');
 
             bcrypt.compare(password, user.password)
@@ -23,6 +28,7 @@ exports.postLogin = (req, res) => {
                             res.redirect('/');
                         });
                     }
+                    req.flash('error', 'Invalid email or password.');
                     res.redirect('/login');
                 })
                 .catch(err => {
@@ -35,7 +41,11 @@ exports.postLogin = (req, res) => {
 };
 
 exports.getSignup = (req, res) => {
-    res.render('auth/signup', { path: '/signup', pageTitle: 'Signup', isAuthenticated: false });
+    let message = req.flash('error');
+    if (message.length > 0) message = message[0];
+    else message = null;
+
+    res.render('auth/signup', { path: '/signup', pageTitle: 'Signup', errorMessage: message });
 }
 
 exports.postSignup = (req, res) => {
@@ -44,7 +54,10 @@ exports.postSignup = (req, res) => {
     const cpassword = req.body.confirmPassword;
     User.findOne({ email: email })
         .then(userdoc => {
-            if (userdoc) return res.redirect('/signup');
+            if (userdoc) {
+                req.flash('error', 'E-mail exists already, please pick a different one.');
+                return res.redirect('/signup');
+            }
             return bcrypt.hash(password, 12)
                 .then(hashedPassword => {
                     const user = new User({
