@@ -16,6 +16,7 @@ const User = require('./models/user');
 const MONGODB_URI = 'mongodb+srv://prabeen:CVveoqfTEGyAJXqD@cluster0-dtqbk.mongodb.net/shop';
 
 const app = express();
+require('dotenv').load();
 const store = new MondoDBStore({
     uri: MONGODB_URI,
     collection: 'sessions'
