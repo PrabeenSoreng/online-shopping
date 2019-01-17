@@ -1,7 +1,7 @@
 const { validationResult } = require('express-validator/check');
 const Product = require('../models/product');
 
-exports.getAddProduct = (req, res) => {
+exports.getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
         pageTitle: 'Add Product',
         path: '/admin/add-product',
@@ -12,7 +12,7 @@ exports.getAddProduct = (req, res) => {
     });
 };
 
-exports.postAddProduct = (req, res) => {
+exports.postAddProduct = (req, res, next) => {
     const title = req.body.title;
     const price = req.body.price;
     const description = req.body.description;
@@ -21,7 +21,7 @@ exports.postAddProduct = (req, res) => {
     if (!errors.isEmpty()) {
         return res.status(422).render('admin/edit-product', {
             pageTitle: 'Add Product',
-            path: '/admin/edit-product',
+            path: '/admin/add-product',
             hasError: true,
             editing: false,
             product: {
@@ -42,10 +42,15 @@ exports.postAddProduct = (req, res) => {
             console.log('Product Created');
             res.redirect('/admin/products');
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err);
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };
 
-exports.getEditProduct = (req, res) => {
+exports.getEditProduct = (req, res, next) => {
     const editMode = req.query.edit;
     if (!editMode) return res.redirect('/');
     const prodId = req.params.productId;
@@ -63,10 +68,15 @@ exports.getEditProduct = (req, res) => {
                 validationErrors: []
             });
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err);
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };
 
-exports.postEditProduct = (req, res) => {
+exports.postEditProduct = (req, res, next) => {
     const prodId = req.body.productId;
     const updatedTitle = req.body.title;
     const updatedPrice = req.body.price;
@@ -105,27 +115,47 @@ exports.postEditProduct = (req, res) => {
                     console.log('Product Updated')
                     res.redirect('/admin/products');
                 })
-                .catch(err => console.log(err));
+                .catch(err => {
+                    console.log(err);
+                    const error = new Error(err);
+                    error.httpStatusCode = 500;
+                    return next(error);
+                });
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err);
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };
 
-exports.getProducts = (req, res) => {
+exports.getProducts = (req, res, next) => {
     Product.find({ userId: req.user._id })
         // .select('title price -_id')
         // .populate('userId', 'name')
         .then(products => {
             res.render('admin/products', { prods: products, pageTitle: 'Admin Products', path: '/admin/products' });
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err);
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };
 
-exports.postDeleteProduct = (req, res) => {
+exports.postDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId;
     Product.deleteOne({ _id: prodId, userId: req.user._id })
         .then(result => {
             console.log('Product Removed');
             res.redirect('/admin/products');
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err);
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };

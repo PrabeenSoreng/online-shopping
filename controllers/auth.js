@@ -7,6 +7,7 @@ const sendGridTransport = require('nodemailer-sendgrid-transport');
 
 const User = require('../models/user');
 
+require('dotenv').config();
 const transporter = nodemailer.createTransport(sendGridTransport({
     auth: {
         api_key: process.env.SG_API_KEY
@@ -51,7 +52,12 @@ exports.postLogin = (req, res) => {
                 });
 
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err);
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };
 
 exports.getSignup = (req, res) => {
@@ -90,7 +96,12 @@ exports.postSignup = (req, res) => {
                 html: `<h1>You succeessfully signed up!</h1>`
             });
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err);
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 }
 
 exports.postLogout = (req, res) => {
@@ -137,7 +148,12 @@ exports.postReset = (req, res) => {
                     `
                 });
             })
-            .catch(err => console.log(err));
+            .catch(err => {
+                console.log(err);
+                const error = new Error(err);
+                error.httpStatusCode = 500;
+                return next(error);
+            });
     });
 };
 
@@ -151,7 +167,12 @@ exports.getNewPassword = (req, res) => {
 
             res.render('auth/new-password', { path: '/new-password', pageTitle: 'New Password', errorMessage: message, userId: user._id.toString(), passwordToken: token });
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err);
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };
 
 exports.postNewPassword = (req, res) => {
@@ -174,5 +195,10 @@ exports.postNewPassword = (req, res) => {
         .then(result => {
             res.redirect('/login');
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err);
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };
