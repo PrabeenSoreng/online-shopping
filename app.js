@@ -4,6 +4,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const MondoDBStore = require('connect-mongodb-session')(session);
 const bodyParser = require('body-parser');
+const multer = require('multer');
 const csrf = require('csurf');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
@@ -23,10 +24,26 @@ const store = new MondoDBStore({
 });
 const csrfProtection = csrf();
 
+const storage = multer.diskStorage({
+    destination: __dirname + '/images/',
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname)
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+};
+
 app.set('view engine', 'ejs');
 app.set('views');
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(multer({ storage, fileFilter }).single('image'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({ secret: 'my secret', resave: false, saveUninitialized: false, store: store }));
 app.use(csrfProtection);
@@ -61,6 +78,7 @@ app.use('/500', error.get500);
 app.use(error.get404);
 
 app.use((error, req, res, next) => {
+    console.log(error);
     res.status(500).render('500', { pageTitle: 'Error', path: '', isAuthenticated: req.session.isLoggedIn });
 });
 
