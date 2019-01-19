@@ -8,12 +8,12 @@
                     <ul class="cart__item-list">
                         <% products.forEach(p => { %>
                             <li class="cart__item">
-                                <h1>
+                                <h3>
                                     <%= p.productId.title %>
-                                </h1>
-                                <h2>Quantity:
+                                </h3>
+                                <h4>Quantity:
                                     <%= p.quantity %>
-                                </h2>
+                                </h4>
                                 <form action="/cart-delete-item" method="POST">
                                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                     <input type="hidden" name="productId" value="<%= p.productId._id %>">

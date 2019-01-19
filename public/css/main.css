@@ -170,7 +170,7 @@ img {
 }
 
 .cart__item-list {
-    width: 50%;
+    width: 80%;
     margin: auto;
     padding: 5px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
@@ -182,11 +182,11 @@ img {
     align-items: center;
 }
 
-.cart__item h1 {
+.cart__item h3 {
     flex-grow: 8;
 }
 
-.cart__item h2,
+.cart__item h4,
 .cart__item form {
     flex-grow: 1;
 }
