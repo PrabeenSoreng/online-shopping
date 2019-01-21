@@ -4,6 +4,10 @@ const PDFDocument = require('pdfkit');
 const Product = require('../models/product');
 const Order = require('../models/order');
 
+require('dotenv').config();
+const stripe = require("stripe")(process.env.STRIPE_API_KEY);
+
+
 const ITEMS_PER_PAGE = 2;
 
 exports.getIndex = (req, res) => {
@@ -133,11 +137,21 @@ exports.postCartDeleteProduct = (req, res) => {
         });
 };
 
-exports.postOrder = (req, res) => {
+exports.postOrder = (req, res, next) => {
+
+    // Token is created using Checkout or Elements!
+    // Get the payment token ID submitted by the form:
+    const token = req.body.stripeToken;
+    let totalSum = 0;
+
     req.user
         .populate('cart.items.productId')
         .execPopulate()
         .then(user => {
+            user.cart.items.forEach(p => {
+                totalSum += p.quantity * p.productId.price;
+            });
+
             const products = user.cart.items.map(item => {
                 return {
                     product: {...item.productId._doc },
@@ -154,6 +168,13 @@ exports.postOrder = (req, res) => {
             return order.save();
         })
         .then(result => {
+            const charge = stripe.charges.create({
+                amount: Math.round(totalSum.toFixed(2) * 100),
+                currency: 'usd',
+                description: 'Demo Order',
+                source: token,
+                metadata: { order_id: result._id.toString() }
+            });
             return req.user.clearCart();
         })
         .then(() => {
@@ -229,6 +250,27 @@ exports.getInvoice = (req, res, next) => {
         .catch(err => next(err));
 };
 
-exports.getCheckout = (req, res) => {
-    res.render('shop/checkout', { pageTitle: 'Checkout', path: '/checkout' })
+exports.getCheckout = (req, res, next) => {
+    req.user
+        .populate('cart.items.productId')
+        .execPopulate()
+        .then(user => {
+            const products = user.cart.items;
+            let total = 0;
+            products.forEach(p => {
+                total += p.quantity * p.productId.price;
+            });
+            res.render('shop/checkout', {
+                pageTitle: 'Checkout',
+                path: '',
+                products: products,
+                totalSum: total
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };

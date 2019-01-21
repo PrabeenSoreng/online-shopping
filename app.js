@@ -10,6 +10,8 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 const error = require('./controllers/not-found');
+const shopController = require('./controllers/shop');
+const isAuth = require('./middleware/is-auth');
 // const mongoConnect = require('./util/database').mongoConnect;
 const mongoose = require('mongoose');
 const User = require('./models/user');
@@ -72,6 +74,12 @@ app.use((req, res, next) => {
         });
 });
 
+app.get('/checkout', isAuth, shopController.getCheckout);
+
+// app.use(csrfProtection);
+// app.use((req, res, next) => {
+//     next();
+// });
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
